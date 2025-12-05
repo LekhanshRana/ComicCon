@@ -3,6 +3,7 @@ export interface WordConfig {
   displayName: string; // The clue/label might use this
   answer: string;
   clue: string;
+  hint: string; // New static hint field
   secretIndex: number; // Which index of the answer maps to the secret phrase
   secretPosition: number; // Where it goes in the secret phrase (0-16)
   direction: 'ACROSS' | 'DOWN';

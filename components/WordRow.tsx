@@ -1,7 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { WordConfig } from '../types';
-import { getMagicalHint } from '../services/geminiService';
-import { Wand2, Sparkles, Loader } from 'lucide-react';
+import { Wand2, Sparkles } from 'lucide-react';
 
 interface WordRowProps {
   word: WordConfig;
@@ -11,8 +10,7 @@ interface WordRowProps {
 
 export const WordRow: React.FC<WordRowProps> = ({ word, currentAnswer, onChange }) => {
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
-  const [hint, setHint] = useState<string>('');
-  const [loadingHint, setLoadingHint] = useState(false);
+  const [hintRevealed, setHintRevealed] = useState(false);
 
   // Initialize input refs
   useEffect(() => {
@@ -35,12 +33,8 @@ export const WordRow: React.FC<WordRowProps> = ({ word, currentAnswer, onChange 
     }
   };
 
-  const handleMagicalHint = async () => {
-    if (hint) return;
-    setLoadingHint(true);
-    const magicalHint = await getMagicalHint(word.displayName, word.clue);
-    setHint(magicalHint);
-    setLoadingHint(false);
+  const revealHint = () => {
+    setHintRevealed(true);
   };
 
   return (
@@ -55,22 +49,18 @@ export const WordRow: React.FC<WordRowProps> = ({ word, currentAnswer, onChange 
           </div>
           
           <button
-            onClick={handleMagicalHint}
-            disabled={loadingHint || !!hint}
+            onClick={revealHint}
+            disabled={hintRevealed}
             className={`
               flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all
-              ${hint 
+              ${hintRevealed 
                 ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20 cursor-default' 
                 : 'bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 hover:bg-indigo-500/20 hover:text-indigo-200'
               }
             `}
           >
-            {loadingHint ? (
-              <Loader size={12} className="animate-spin" />
-            ) : (
-              <Wand2 size={12} />
-            )}
-            {hint ? 'Revealed' : 'Magical Hint'}
+            <Wand2 size={12} />
+            {hintRevealed ? 'Revealed' : 'Magical Hint'}
           </button>
         </div>
 
@@ -117,10 +107,10 @@ export const WordRow: React.FC<WordRowProps> = ({ word, currentAnswer, onChange 
         </div>
 
         {/* Revealed Hint */}
-        {hint && (
+        {hintRevealed && (
           <div className="mt-1 p-3 bg-indigo-950/30 rounded-lg border border-indigo-500/20 animate-fade-in flex gap-2">
             <Sparkles size={16} className="text-indigo-400 flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-indigo-200 font-serif italic">{hint}</p>
+            <p className="text-xs text-indigo-200 font-serif italic">{word.hint}</p>
           </div>
         )}
       </div>
